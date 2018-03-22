@@ -74,7 +74,8 @@
   */
 
 enum { MACRO_VERSION_INFO,
-       MACRO_ANY
+       MACRO_ANY,
+       MACRO_MAXIMIZE_WINDOW
      };
 
 
@@ -121,7 +122,7 @@ enum { MACRO_VERSION_INFO,
   *
   */
 
-enum { QWERTY, NUMPAD, FUNCTION }; // layers
+enum { QWERTY, NUMPAD, FUNCTION, MACROS }; // layers
 
 /* This comment temporarily turns off astyle's indent enforcement
  *   so we can make the keymaps actually resemble the physical key layout better
@@ -141,7 +142,7 @@ const Key keymaps[][ROWS][COLS] PROGMEM = {
    M(MACRO_ANY),  Key_6, Key_7, Key_8,     Key_9,         Key_0,         LockLayer(NUMPAD),
    Key_Enter,     Key_Y, Key_U, Key_I,     Key_O,         Key_P,         Key_Equals,
                   Key_H, Key_J, Key_K,     Key_L,         Key_Semicolon, Key_Quote,
-   Key_RightAlt,  Key_N, Key_M, Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
+   ShiftToLayer(MACROS),  Key_N, Key_M, Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
    Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
    ShiftToLayer(FUNCTION)),
 
@@ -163,9 +164,9 @@ const Key keymaps[][ROWS][COLS] PROGMEM = {
 
   [FUNCTION] =  KEYMAP_STACKED
   (___,      Key_F1,           Key_F2,      Key_F3,     Key_F4,        Key_F5,           XXX,
-   Key_Tab,  ___,              Key_mouseUp, ___,        Key_mouseBtnR, Key_mouseWarpEnd, Key_mouseWarpNE,
+   Key_Tab,  Key_mouseScrollDn,Key_mouseUp, ___,        Key_mouseBtnR, Key_mouseWarpEnd, Key_mouseWarpNE,
    Key_Home, Key_mouseL,       Key_mouseDn, Key_mouseR, Key_mouseBtnL, Key_mouseWarpNW,
-   Key_End,  Key_PrintScreen,  Key_Insert,  ___,        Key_mouseBtnM, Key_mouseWarpSW,  Key_mouseWarpSE,
+   Key_End,  Key_mouseScrollUp,Key_Insert,  ___,        Key_mouseBtnM, Key_mouseWarpSW,  Key_mouseWarpSE,
    ___, Key_Delete, ___, ___,
    ___,
 
@@ -174,7 +175,22 @@ const Key keymaps[][ROWS][COLS] PROGMEM = {
                                Key_LeftArrow,          Key_DownArrow,            Key_UpArrow,              Key_RightArrow,  ___,              ___,
    Key_PcApplication,          Consumer_Mute,          Consumer_VolumeDecrement, Consumer_VolumeIncrement, ___,             Key_Backslash,    Key_Pipe,
    ___, ___, Key_Enter, ___,
-   ___)
+   ___),
+
+  [MACROS] = KEYMAP_STACKED
+  (___,          Key_1, Key_2, Key_3, Key_4, Key_5, Key_LEDEffectNext,
+   Key_Backtick, Key_Q, Key_W, Key_E, Key_R, Key_T, Key_Tab,
+   Key_PageUp,   Key_A, Key_S, Key_D, M(MACRO_MAXIMIZE_WINDOW), Key_G,
+   Key_PageDown, Key_Z, Key_X, Key_C, Key_V, Key_B, Key_Escape,
+   Key_LeftControl, Key_Backspace, Key_LeftGui, Key_LeftShift,
+   ShiftToLayer(FUNCTION),
+
+   M(MACRO_ANY),  Key_6, Key_7, Key_8,     Key_9,         Key_0,         LockLayer(NUMPAD),
+   Key_Enter,     Key_Y, Key_U, Key_I,     Key_O,         Key_P,         Key_Equals,
+                  Key_H, Key_J, Key_K,     Key_L,         Key_Semicolon, Key_Quote,
+   Key_RightAlt,  Key_N, Key_M, Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
+   Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
+   ShiftToLayer(FUNCTION))
 
 };
 
@@ -210,7 +226,6 @@ static void anyKeyMacro(uint8_t keyState) {
     kaleidoscope::hid::pressKey(lastKey);
 }
 
-
 /** macroAction dispatches keymap events that are tied to a macro
     to that macro. It takes two uint8_t parameters.
 
@@ -233,7 +248,16 @@ const macro_t *macroAction(uint8_t macroIndex, uint8_t keyState) {
   case MACRO_ANY:
     anyKeyMacro(keyState);
     break;
+
+  case MACRO_MAXIMIZE_WINDOW:
+    return MACRODOWN(
+      D(LeftControl), D(LeftAlt), D(LeftGui),
+      T(M),
+      U(LeftControl), U(LeftAlt), U(LeftGui)
+    );
+    break;
   }
+
   return MACRO_NONE;
 }
 
@@ -296,7 +320,7 @@ void setup() {
     &BootGreetingEffect,
 
     // The hardware test mode, which can be invoked by tapping Prog, LED and the left Fn button at the same time.
-    &TestMode,
+    // &TestMode,
 
     // LEDControl provides support for other LED modes
     &LEDControl,
@@ -306,25 +330,25 @@ void setup() {
 
     // The rainbow effect changes the color of all of the keyboard's keys at the same time
     // running through all the colors of the rainbow.
-    &LEDRainbowEffect,
+    // &LEDRainbowEffect,
 
-    // The rainbow wave effect lights up your keyboard with all the colors of a rainbow
-    // and slowly moves the rainbow across your keyboard
-    &LEDRainbowWaveEffect,
+    // // The rainbow wave effect lights up your keyboard with all the colors of a rainbow
+    // // and slowly moves the rainbow across your keyboard
+    // &LEDRainbowWaveEffect,
 
-    // The chase effect follows the adventure of a blue pixel which chases a red pixel across
-    // your keyboard. Spoiler: the blue pixel never catches the red pixel
-    &LEDChaseEffect,
+    // // The chase effect follows the adventure of a blue pixel which chases a red pixel across
+    // // your keyboard. Spoiler: the blue pixel never catches the red pixel
+    // &LEDChaseEffect,
 
-    // These static effects turn your keyboard's LEDs a variety of colors
-    &solidRed, &solidOrange, &solidYellow, &solidGreen, &solidBlue, &solidIndigo, &solidViolet,
+    // // These static effects turn your keyboard's LEDs a variety of colors
+    // &solidRed, &solidOrange, &solidYellow, &solidGreen, &solidBlue, &solidIndigo, &solidViolet,
 
-    // The breathe effect slowly pulses all of the LEDs on your keyboard
-    &LEDBreatheEffect,
+    // // The breathe effect slowly pulses all of the LEDs on your keyboard
+    // &LEDBreatheEffect,
 
-    // The AlphaSquare effect prints each character you type, using your
-    // keyboard's LEDs as a display
-    &AlphaSquareEffect,
+    // // The AlphaSquare effect prints each character you type, using your
+    // // keyboard's LEDs as a display
+    // &AlphaSquareEffect,
 
     // The stalker effect lights up the keys you've pressed recently
     &StalkerEffect,
@@ -353,8 +377,8 @@ void setup() {
 
   // We set the brightness of the rainbow effects to 150 (on a scale of 0-255)
   // This draws more than 500mA, but looks much nicer than a dimmer effect
-  LEDRainbowEffect.brightness(150);
-  LEDRainbowWaveEffect.brightness(150);
+  // LEDRainbowEffect.brightness(150);
+  // LEDRainbowWaveEffect.brightness(150);
 
   // The LED Stalker mode has a few effects. The one we like is
   // called 'BlazingTrail'. For details on other options,
@@ -368,6 +392,8 @@ void setup() {
   // This avoids over-taxing devices that don't have a lot of power to share
   // with USB devices
   LEDOff.activate();
+
+  MouseKeys.speed = 5;
 }
 
 /** loop is the second of the standard Arduino sketch functions.
