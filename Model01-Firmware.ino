@@ -75,7 +75,11 @@
 
 enum { MACRO_VERSION_INFO,
        MACRO_ANY,
-       MACRO_MAXIMIZE_WINDOW
+       MACRO_MAXIMIZE_WINDOW,
+       MACRO_MONITOR_LEFT,
+       MACRO_MONITOR_RIGHT,
+       MACRO_WINDOW_LEFT,
+       MACRO_WINDOW_RIGHT
      };
 
 
@@ -179,8 +183,8 @@ const Key keymaps[][ROWS][COLS] PROGMEM = {
 
   [MACROS] = KEYMAP_STACKED
   (___,          Key_1, Key_2, Key_3, Key_4, Key_5, Key_LEDEffectNext,
-   Key_Backtick, Key_Q, Key_W, Key_E, Key_R, Key_T, Key_Tab,
-   Key_PageUp,   Key_A, Key_S, Key_D, M(MACRO_MAXIMIZE_WINDOW), Key_G,
+   Key_Backtick, M(MACRO_WINDOW_LEFT), Key_W, M(MACRO_WINDOW_RIGHT), Key_R, Key_T, Key_Tab,
+   Key_PageUp,   M(MACRO_MONITOR_LEFT), ___, M(MACRO_MONITOR_RIGHT), M(MACRO_MAXIMIZE_WINDOW), Key_G,
    Key_PageDown, Key_Z, Key_X, Key_C, Key_V, Key_B, Key_Escape,
    Key_LeftControl, Key_Backspace, Key_LeftGui, Key_LeftShift,
    ShiftToLayer(FUNCTION),
@@ -253,6 +257,38 @@ const macro_t *macroAction(uint8_t macroIndex, uint8_t keyState) {
     return MACRODOWN(
       D(LeftControl), D(LeftAlt), D(LeftGui),
       T(M),
+      U(LeftControl), U(LeftAlt), U(LeftGui)
+    );
+    break;
+
+  case MACRO_MONITOR_LEFT:
+    return MACRODOWN(
+      D(LeftControl), D(LeftAlt),
+      T(LeftArrow),
+      U(LeftControl), U(LeftAlt)
+    );
+    break;
+
+  case MACRO_MONITOR_RIGHT:
+    return MACRODOWN(
+      D(LeftControl), D(LeftAlt),
+      T(RightArrow),
+      U(LeftControl), U(LeftAlt)
+    );
+    break;
+
+  case MACRO_WINDOW_LEFT:
+    return MACRODOWN(
+      D(LeftControl), D(LeftAlt), D(LeftGui),
+      T(LeftArrow),
+      U(LeftControl), U(LeftAlt), U(LeftGui)
+    );
+    break;
+
+  case MACRO_WINDOW_RIGHT:
+    return MACRODOWN(
+      D(LeftControl), D(LeftAlt), D(LeftGui),
+      T(RightArrow),
       U(LeftControl), U(LeftAlt), U(LeftGui)
     );
     break;
